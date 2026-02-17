@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@1,2&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  background-color: #f1f6f1; /* daisy-white */
+}
+
+body {
+  font-family: "Satoshi", sans-serif;
+  color: #29314d; /* dark-space */
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+@layer components {
+  .btn-neubrutalism {
+    @apply relative inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 border-2 border-black rounded-full;
+    background-color: theme("colors.blue-violet");
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+
+  .btn-neubrutalism:hover {
+    @apply -translate-x-0.5 -translate-y-0.5;
+    box-shadow: 6px 6px 0px 0px #000;
+  }
+
+  .btn-neubrutalism:active {
+    @apply translate-x-0.5 translate-y-0.5;
+    box-shadow: 2px 2px 0px 0px #000;
+  }
+}
