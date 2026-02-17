@@ -19,10 +19,18 @@ const Footer = () => {
             What we're building
           </h4>
           <p className="text-white/70 text-lg md:text-xl font-medium leading-relaxed">
-            A real-time community home powered by Lingo.dev’s AI localization
-            engine. Built for the hackathon to demonstrate how Lingo.dev
-            automates global connection by breaking every language barrier with
-            context-aware translations.
+            A real-time community home powered by{" "}
+            <a
+              href="https://lingo.dev/en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-violet underline hover:opacity-80 transition-opacity"
+            >
+              Lingo.dev
+            </a>
+            ’s AI localization engine. Built for the hackathon to demonstrate
+            how Lingo.dev automates global connection by breaking every language
+            barrier with context-aware translations.
           </p>
         </div>
 

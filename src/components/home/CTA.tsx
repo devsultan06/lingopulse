@@ -1,9 +1,14 @@
 import { motion } from "framer-motion";
 
-const CTA = () => {
+interface CTAProps {
+  onJoinClick: () => void;
+}
+
+const CTA = ({ onJoinClick }: CTAProps) => {
   return (
     <section
-      className="relative w-full h-[400px] md:h-[400px] flex items-center justify-center bg-[#6E61FF]"
+      id="cta"
+      className="relative w-full h-[500px] md:h-[500px] flex items-center justify-center bg-[#6E61FF]"
       style={{
         backgroundImage: "url('/images/cta_fold_grid.svg')",
         backgroundPosition: "50% 100%",
@@ -75,9 +80,19 @@ const CTA = () => {
           Ready to stay ahead of <br />
           the <span className="">language</span> game?
         </h2>
-        <p className="text-xl md:text-2xl font-bold font-space-grotesk text-white">
+        <p className="text-xl md:text-2xl font-bold font-space-grotesk text-white mb-10">
           Join our growing community today!
         </p>
+
+        <button
+          onClick={onJoinClick}
+          className="relative inline-flex items-center justify-center px-10 py-5 group"
+        >
+          <div className="absolute inset-0 bg-black rounded-full translate-x-1.5 translate-y-1.5" />
+          <div className="relative bg-white border-2 border-black text-black font-black text-xl rounded-full px-10 py-5 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 font-space-grotesk tracking-tight">
+            Join Now <span className="ml-2">›</span>
+          </div>
+        </button>
       </motion.div>
     </section>
   );

@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface NavbarProps {
+  onJoinClick: () => void;
+}
+
 export const LingoPulseLogo = ({
   className = "w-10 h-10",
 }: {
@@ -33,7 +37,7 @@ export const LingoPulseLogo = ({
   </div>
 );
 
-const Navbar = () => {
+const Navbar = ({ onJoinClick }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState("EN");
@@ -103,7 +107,7 @@ const Navbar = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full right-0 mt-2 bg-white border-4 border-black rounded-2xl p-2 shadow-[4px_4px_0px_0px_#000] min-w-[120px]"
+                    className="absolute top-full right-0 mt-2 bg-white border-2 border-black rounded-2xl p-2 shadow-[4px_4px_0px_0px_#000] min-w-[120px]"
                   >
                     {languages.map((lang) => (
                       <button
@@ -123,12 +127,12 @@ const Navbar = () => {
             </div>
 
             {/* Join Now Button */}
-            <Link
-              to="/join"
+            <button
+              onClick={onJoinClick}
               className="btn-neubrutalism text-[20px] px-8 py-3 font-space-grotesk"
             >
               Join Now <span className="ml-2">›</span>
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -218,25 +222,29 @@ const Navbar = () => {
 
                   <div className="h-0.5 bg-black/10 my-4"></div>
 
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-2xl font-bold hover:text-blue-violet"
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onJoinClick();
+                    }}
+                    className="text-2xl font-bold hover:text-blue-violet text-left"
                   >
                     Login
-                  </Link>
+                  </button>
 
-                  <Link
-                    to="/join"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="relative inline-flex items-center justify-center py-5 mt-4 group"
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onJoinClick();
+                    }}
+                    className="relative inline-flex items-center justify-center py-5 mt-4 group w-full"
                   >
                     <div className="absolute inset-0 bg-black rounded-full translate-x-1 translate-y-1"></div>
                     <div className="absolute inset-0 bg-blue-violet border-2 border-black rounded-full"></div>
                     <span className="relative text-white font-bold text-xl flex items-center gap-2">
                       Join Now <span className="text-2xl">›</span>
                     </span>
-                  </Link>
+                  </button>
                 </div>
 
                 <div className="mt-auto pt-10 flex items-center gap-4">

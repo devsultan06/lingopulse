@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 
-const Hero = () => {
+interface HeroProps {
+  onJoinClick: () => void;
+}
+
+const Hero = ({ onJoinClick }: HeroProps) => {
   return (
     <div
       className="bg-daisy-white rounded-[48px] p-8 md:p-10 relative overflow-hidden"
@@ -106,13 +110,23 @@ const Hero = () => {
             their own language — and everyone understands.
           </p>
 
-          <button className="btn-neubrutalism text-xl px-10 py-4 mb-4">
-            Join The Live Demo <span className="ml-2">›</span>
+          <button
+            onClick={onJoinClick}
+            className="btn-neubrutalism text-xl px-12 py-5 mb-6 active:scale-95 transition-transform"
+          >
+            Join The Pulse <span className="ml-2">›</span>
           </button>
 
           <p className="text-sm font-bold font-space-grotesk text-dark-space/40 tracking-tight">
             Powered by{" "}
-            <span className="text-tangelo-orange underline">Lingo.dev</span>
+            <a
+              href="https://lingo.dev/en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-tangelo-orange underline hover:opacity-80 transition-opacity"
+            >
+              Lingo.dev
+            </a>
           </p>
         </motion.div>
       </div>
