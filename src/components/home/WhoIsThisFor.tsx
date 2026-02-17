@@ -63,8 +63,8 @@ const WhoIsThisFor = () => {
           </div>
 
           {/* Top-Right Badge */}
-          <div className="absolute -top-8 -right-8 w-32 h-32 bg-tangelo-orange border-2 border-black rounded-full flex items-center justify-center rotate-[15deg] shadow-[2px_2px_0px_0px_#000] group overflow-hidden">
-            <span className="text-white font-bold text-center text-sm md:text-base px-2 uppercase leading-tight font-space-grotesk">
+          <div className="absolute -top-4 -right-4 md:-top-8 md:-right-8 w-20 h-20 md:w-32 md:h-32 bg-tangelo-orange border-2 border-black rounded-full flex items-center justify-center rotate-[15deg] shadow-[2px_2px_0px_0px_#000] group overflow-hidden">
+            <span className="text-white font-bold text-center text-xs md:text-base px-2 uppercase leading-tight font-space-grotesk">
               Anyone in
               <br />
               LingoPulse!
@@ -73,7 +73,7 @@ const WhoIsThisFor = () => {
 
           {/* Content */}
           <div className="text-center">
-            <h2 className="text-4xl md:text-6xl font-black font-space-grotesk mb-8 tracking-tighter">
+            <h2 className="text-3xl md:text-6xl font-black font-space-grotesk mb-8 tracking-tighter">
               Who Is This For?
             </h2>
             <div className="space-y-6">

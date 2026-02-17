@@ -48,18 +48,18 @@ const FAQ = () => {
         </h2>
 
         {/* Orange Spike Decoration Behind */}
-        <div className="absolute top-[10px] -right-10 md:-right-16 z-0 hidden md:block">
+        <div className="absolute top-[50px] -right-4 md:-right-16 z-0 block">
           <img
             src="/images/faq_orange_spike.png"
             alt=""
-            className="w-[150px] md:w-[180px] h-auto pointer-events-none"
+            className="w-[100px] md:w-[180px] h-auto pointer-events-none"
           />
         </div>
-        <div className="absolute -bottom-12 -left-[80px] z-20 hidden md:block">
+        <div className="absolute -bottom-10 -left-1 md:-bottom-12 md:-left-[80px] z-20 block">
           <img
             src="/images/flower_cta.svg"
             alt=""
-            className="w-[60px] h-[60px]"
+            className="w-10 h-10 md:w-[60px] md:h-[60px]"
           />
         </div>
 

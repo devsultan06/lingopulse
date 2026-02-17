@@ -103,12 +103,12 @@ const HowItWorks = () => {
       className="pt-[250px] pb-32 bg-white relative "
     >
       {/* Decorative Blue Wheel (Bottom Left) - ROTATES ON SCROLL */}
-      <div className="absolute bottom-[-60px] z-30 left-[-60px] hidden lg:block">
+      <div className="absolute bottom-[-30px] left-[-30px] md:bottom-[-60px] md:left-[-60px] z-30 block">
         <motion.img
           style={{ rotate }}
           src="/images/blue_wheel.svg"
           alt="decoration"
-          className="w-64 h-64"
+          className="w-32 h-32 md:w-64 md:h-64"
         />
       </div>
 

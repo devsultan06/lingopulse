@@ -15,38 +15,34 @@ const CTA = () => {
       {/* Decorative Shapes - Exact Placements from Reference */}
 
       {/* Top Left - Blue Diamond */}
-      <div className="absolute top-[-5%] left-[8%] hidden md:block">
+      <div className="absolute top-[-5%] left-[8%] block">
         <img
           src="/images/blue_diamond.svg"
           alt=""
-          className="w-[72px] h-[73px]"
+          className="w-10 h-10 md:w-[72px] md:h-[73px]"
         />
       </div>
 
       {/* Mid Left - Red Star */}
       <div className="absolute top-[40%] left-[10%] hidden lg:block">
-        <img
-          src="/images/red_star.svg"
-          alt=""
-          className="w-16 h-16 rotate-[-10deg]"
-        />
+        <img src="/images/red_star.svg" alt="" className="w-16 h-16 " />
       </div>
 
       {/* Bottom Left - Yellow Diamond */}
-      <div className="absolute bottom-[-10%] z-30 left-[2%] hidden md:block">
+      <div className="absolute bottom-[-10%] z-30 left-[2%] block">
         <img
           src="/images/yellow_diamond_cta.svg"
           alt=""
-          className="w-[110px] h-[114px]"
+          className="w-16 h-16 md:w-[110px] md:h-[114px]"
         />
       </div>
 
       {/* Top Right - Green Blob (Teal Shine) */}
-      <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 hidden md:block z-20">
+      <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 block z-20">
         <img
           src="/images/teal_shine.svg"
           alt=""
-          className="w-48 h-48 opacity-90"
+          className="w-24 h-24 md:w-48 md:h-48"
         />
       </div>
 
@@ -60,11 +56,11 @@ const CTA = () => {
       </div>
 
       {/* Bottom Center-ish - Flower */}
-      <div className="absolute bottom-[14%] right-[33%] hidden md:block">
+      <div className="absolute bottom-[14%] right-[33%] block">
         <img
           src="/images/flower_cta.svg"
           alt=""
-          className="w-[62px] h-[62px]"
+          className="w-10 h-10 md:w-[62px] md:h-[62px]"
         />
       </div>
 
@@ -83,8 +79,6 @@ const CTA = () => {
           Join our growing community today!
         </p>
       </motion.div>
-
-
     </section>
   );
 };

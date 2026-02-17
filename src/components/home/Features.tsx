@@ -49,7 +49,7 @@ const Features = () => {
         <img
           src="/images/blue_spike.svg"
           alt="Decoration"
-          className="w-[279px] h-[279px] "
+          className="w-[150px] h-[150px] md:w-[279px] md:h-[279px]"
         />
       </div>
 
@@ -58,7 +58,7 @@ const Features = () => {
         <img
           src="/images/red_spike.svg"
           alt="Decoration"
-          className="w-[279px] h-[279px] "
+          className="w-[150px] h-[150px] md:w-[279px] md:h-[279px]"
         />
       </div>
 
@@ -97,15 +97,15 @@ const Features = () => {
       </div>
 
       {/* Bottom Badge/Pill - Overlapping Section Boundary */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-50">
-        <div className="bg-[#E2F7ED] border-4 border-black rounded-full px-12 py-6 flex items-center gap-4 shadow-[6px_6px_0px_0px_#000] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 cursor-pointer">
-          <span className="text-3xl font-black font-space-grotesk tracking-tighter">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-50 w-max">
+        <div className="bg-[#E2F7ED] border-4 border-black rounded-full px-6 py-3 md:px-12 md:py-6 flex items-center gap-3 md:gap-4 shadow-[4px_4px_0px_0px_#000] md:shadow-[6px_6px_0px_0px_#000] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 cursor-pointer">
+          <span className="text-xl md:text-3xl font-black font-space-grotesk tracking-tighter">
             Built for{" "}
             <span className="text-tangelo-orange italic underline">
               Connection
             </span>
           </span>
-          <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white text-2xl">
+          <div className="w-8 h-8 md:w-12 md:h-12 bg-black rounded-full flex items-center justify-center text-white text-base md:text-2xl">
             ✨
           </div>
         </div>
