@@ -184,7 +184,7 @@ const DashboardPreview = () => {
             <img
               src="/images/just_a_flu.svg"
               alt="Just a flu"
-              className="w-48 h-48 md:w-[200px] md:h-[200px]"
+              className="w-30 h-30 md:w-[200px] md:h-[200px]"
             />
           </div>
         </motion.div>

@@ -173,7 +173,7 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-daisy-white border-l-4 border-black z-50 p-8 shadow-[-8px_0px_0px_0px_rgba(0,0,0,1)]"
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-daisy-white  z-50 p-8 "
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center mb-12">
@@ -209,7 +209,7 @@ const Navbar = () => {
                       key={link.name}
                       href={link.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-3xl font-bold font-space-grotesk hover:text-blue-violet transition-colors flex items-center justify-between"
+                      className="text-2xl font-bold font-space-grotesk hover:text-blue-violet transition-colors flex items-center justify-between"
                     >
                       {link.name}
                       <span className="text-blue-violet">›</span>

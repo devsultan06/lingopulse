@@ -8,7 +8,7 @@ const CTA = () => {
         backgroundImage: "url('/images/cta_fold_grid.svg')",
         backgroundPosition: "50% 100%",
         backgroundRepeat: "no-repeat",
-        backgroundSize: "auto",
+        backgroundSize: "cover",
         overflow: "visible",
       }}
     >
