@@ -43,7 +43,7 @@ const CTA = ({ onJoinClick }: CTAProps) => {
       </div>
 
       {/* Top Right - Green Blob (Teal Shine) */}
-      <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 block z-20">
+      <div className="absolute top-[-20px] right-[-20px] translate-x-1/4 -translate-y-1/4 block z-20">
         <img
           src="/images/teal_shine.svg"
           alt=""
@@ -86,7 +86,7 @@ const CTA = ({ onJoinClick }: CTAProps) => {
 
         <button
           onClick={onJoinClick}
-          className="relative inline-flex items-center justify-center px-10 py-5 group"
+          className="relative inline-flex items-center justify-center "
         >
           <div className="absolute inset-0 bg-black rounded-full translate-x-1.5 translate-y-1.5" />
           <div className="relative bg-white border-2 border-black text-black font-black text-xl rounded-full px-10 py-5 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 font-space-grotesk tracking-tight">
