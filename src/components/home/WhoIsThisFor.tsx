@@ -16,7 +16,10 @@ const WhoIsThisFor = () => {
   ];
 
   return (
-    <section className="relative mt-20 py-32 overflow-hidden bg-white ">
+    <section
+      id="why-it-matters"
+      className="relative mt-20 py-32 overflow-hidden bg-white "
+    >
       {/* Diamond Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none" />
       <div className="absolute inset-0 opacity-100 pointer-events-none select-none overflow-hidden py-10">
@@ -87,8 +90,6 @@ const WhoIsThisFor = () => {
           </div>
         </motion.div>
       </div>
-
-
     </section>
   );
 };

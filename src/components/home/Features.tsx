@@ -40,7 +40,10 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="relative py-40 bg-[#6E48FF]  min-h-screen flex flex-col items-center justify-center">
+    <section
+      id="features"
+      className="relative py-40 bg-[#6E48FF]  min-h-screen flex flex-col items-center justify-center"
+    >
       {/* Top-Left Blue Spike */}
       <div className="absolute top-0 left-0 -translate-x-1/3 -translate-y-1/3 z-20 pointer-events-none">
         <img

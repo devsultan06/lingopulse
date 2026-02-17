@@ -97,7 +97,11 @@ const HowItWorks = () => {
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
 
   return (
-    <section ref={containerRef} className="pt-[250px] pb-32 bg-white relative ">
+    <section
+      ref={containerRef}
+      id="how-it-works"
+      className="pt-[250px] pb-32 bg-white relative "
+    >
       {/* Decorative Blue Wheel (Bottom Left) - ROTATES ON SCROLL */}
       <div className="absolute bottom-[-60px] z-30 left-[-60px] hidden lg:block">
         <motion.img

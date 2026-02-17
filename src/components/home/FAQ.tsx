@@ -41,7 +41,7 @@ const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-24 bg-[#F0F4F2] relative">
+    <section id="faq" className="py-24 bg-[#F0F4F2] relative">
       <div className="max-w-4xl mx-auto px-4 relative">
         <h2 className="text-3xl md:text-4xl font-black font-space-grotesk text-center mb-12 tracking-tight text-[#1C303C]">
           FAQ's

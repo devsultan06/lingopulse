@@ -39,10 +39,10 @@ const Navbar = () => {
   const [currentLang, setCurrentLang] = useState("EN");
 
   const navLinks = [
-    { name: "How It Works", path: "/how-it-works" },
-    { name: "Features", path: "/features" },
-    { name: "Why It Matters", path: "/why" },
-    { name: "FAQ", path: "/faq" },
+    { name: "How It Works", path: "#how-it-works" },
+    { name: "Features", path: "#features" },
+    { name: "Who's it for?", path: "#why-it-matters" },
+    { name: "FAQ", path: "#faq" },
   ];
 
   const languages = ["EN", "FR", "ES", "DE", "ZH"];
@@ -62,13 +62,13 @@ const Navbar = () => {
           {/* Center Links (Simple) */}
           <div className="hidden lg:flex items-center gap-10">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.name}
-                to={link.path}
+                href={link.path}
                 className="font-bold text-[#031926] hover:text-blue-violet transition-colors text-[20px] font-space-grotesk"
               >
                 {link.name}
-              </Link>
+              </a>
             ))}
           </div>
 
@@ -205,15 +205,15 @@ const Navbar = () => {
 
                 <div className="flex flex-col gap-6">
                   {navLinks.map((link) => (
-                    <Link
+                    <a
                       key={link.name}
-                      to={link.path}
+                      href={link.path}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="text-3xl font-bold font-space-grotesk hover:text-blue-violet transition-colors flex items-center justify-between"
                     >
                       {link.name}
                       <span className="text-blue-violet">›</span>
-                    </Link>
+                    </a>
                   ))}
 
                   <div className="h-0.5 bg-black/10 my-4"></div>
