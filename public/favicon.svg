@@ -1,0 +1,23 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with neubrutalism feel -->
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="#F1F6F1" stroke="black" stroke-width="2"/>
+  <rect x="4" y="4" width="24" height="24" rx="4" fill="#6E61FF" opacity="0.1"/>
+  
+  <!-- The Pulse Wave -->
+  <path
+    d="M6 16 H10 L12 8 L14 24 L17 12 L19 16 H26"
+    fill="none"
+    stroke="black"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M6 16 H10 L12 8 L14 24 L17 12 L19 16 H26"
+    fill="none"
+    stroke="#FF611E"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
