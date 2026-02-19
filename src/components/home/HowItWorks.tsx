@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Globe, Zap, ChevronDown, MessageSquareMore } from "lucide-react";
+import { Globe, Zap, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface StepItem {
