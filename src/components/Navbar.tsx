@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../contexts/AuthContext";
 
 interface NavbarProps {
   onJoinClick: () => void;
@@ -40,6 +41,7 @@ export const LingoPulseLogo = ({
 
 const Navbar = ({ onJoinClick }: NavbarProps) => {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
 
@@ -135,13 +137,22 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
               </AnimatePresence>
             </div>
 
-            {/* Join Now Button */}
-            <button
-              onClick={onJoinClick}
-              className="btn-neubrutalism text-[20px] px-8 py-3 font-space-grotesk"
-            >
-              {t("nav.joinNow")} <span className="ml-2">›</span>
-            </button>
+            {/* Join Now / Dashboard Button */}
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="btn-neubrutalism text-[20px] px-8 py-3 font-space-grotesk"
+              >
+                Dashboard <span className="ml-2">›</span>
+              </Link>
+            ) : (
+              <button
+                onClick={onJoinClick}
+                className="btn-neubrutalism text-[20px] px-8 py-3 font-space-grotesk"
+              >
+                {t("nav.joinNow")} <span className="ml-2">›</span>
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -158,7 +169,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={3}
+                strokeWidth={2}
                 d={
                   isMobileMenuOpen
                     ? "M6 18L18 6M6 6l12 12"
@@ -173,106 +184,72 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-            />
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-daisy-white  z-50 p-8 "
-            >
-              <div className="flex flex-col h-full">
-                <div className="flex justify-between items-center mb-12">
-                  <div className="flex items-center gap-3">
-                    <LingoPulseLogo className="w-10 h-10" />
-                    <span className="text-2xl font-bold font-space-grotesk tracking-tighter">
-                      {t("nav.menu")}
-                    </span>
-                  </div>
-                  <button
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-50 bg-daisy-white lg:hidden p-6"
+          >
+            <div className="flex justify-between items-center mb-12">
+              <span className="text-2xl font-black font-space-grotesk tracking-tighter">
+                lingopulse
+              </span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 border-2 border-black rounded-xl"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-8">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-4xl font-black font-space-grotesk tracking-tight hover:text-blue-violet transition-colors"
+                >
+                  {link.name}
+                </a>
+              ))}
+
+              <div className="pt-8 border-t-4 border-black/10">
+                {user ? (
+                  <Link
+                    to="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 border-4 border-black rounded-2xl hover:bg-black/5"
+                    className="btn-neubrutalism w-full text-center py-5 text-2xl"
                   >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-6">
-                  {navLinks.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-2xl font-bold font-space-grotesk hover:text-blue-violet transition-colors flex items-center justify-between"
-                    >
-                      {link.name}
-                      <span className="text-blue-violet">›</span>
-                    </a>
-                  ))}
-
-                  <div className="h-0.5 bg-black/10 my-4"></div>
-
+                    Dashboard
+                  </Link>
+                ) : (
                   <button
                     onClick={() => {
-                      setIsMobileMenuOpen(false);
                       onJoinClick();
-                    }}
-                    className="text-2xl font-bold hover:text-blue-violet text-left"
-                  >
-                    {t("nav.login")}
-                  </button>
-
-                  <button
-                    onClick={() => {
                       setIsMobileMenuOpen(false);
-                      onJoinClick();
                     }}
-                    className="relative inline-flex items-center justify-center py-5 mt-4 group w-full"
+                    className="btn-neubrutalism w-full text-center py-5 text-2xl"
                   >
-                    <div className="absolute inset-0 bg-black rounded-full translate-x-1 translate-y-1"></div>
-                    <div className="absolute inset-0 bg-blue-violet border-2 border-black rounded-full"></div>
-                    <span className="relative text-white font-bold text-xl flex items-center gap-2">
-                      {t("nav.joinNow")} <span className="text-2xl">›</span>
-                    </span>
+                    {t("nav.joinNow")}
                   </button>
-                </div>
-
-                <div className="mt-auto pt-10 flex items-center gap-4">
-                  <span className="text-xl">🌐</span>
-                  <div className="flex gap-3">
-                    {languages.map((l) => (
-                      <button
-                        key={l.code}
-                        onClick={() => i18n.changeLanguage(l.code)}
-                        className={`font-bold text-sm px-2 py-1 rounded-md border-2 border-black transition-colors ${i18n.language === l.code ? "bg-blue-violet text-white" : "bg-black/5"}`}
-                      >
-                        {l.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                )}
               </div>
-            </motion.div>
-          </>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </nav>
