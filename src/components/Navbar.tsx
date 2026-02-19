@@ -57,6 +57,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
     { code: "fr", label: "FR" },
     { code: "es", label: "ES" },
     { code: "ar", label: "AR" },
+    { code: "ha", label: "HA" },
   ];
 
   const currentLangLabel =
@@ -226,6 +227,26 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                   {link.name}
                 </a>
               ))}
+
+              {/* Mobile Language Selector */}
+              <div className="flex gap-4 flex-wrap">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      i18n.changeLanguage(lang.code);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`flex-1 py-3 border-4 border-black font-black text-xl rounded-2xl shadow-[4px_4px_0px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all ${
+                      i18n.language === lang.code
+                        ? "bg-blue-violet text-white"
+                        : "bg-white text-black"
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
 
               <div className="pt-8 border-t-4 border-black/10">
                 {user ? (

@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "howItWorks": "Yadda yake aiki",
+    "features": "Siffofin",
+    "whoIsItFor": "Daga wa ne?",
+    "faq": "Tambayoyi",
+    "joinNow": "Shiga Yanzu",
+    "login": "Shiga",
+    "menu": "Menu"
+  },
+  "hero": {
+    "title1": "Inda",
+    "titleHighlight": "Duniya",
+    "title2": "Take Magana",
+    "title3": "Tare",
+    "subtitle": "Wani dandalin sadarwa na harsuna da yawa na gaske inda kowa ke magana da harshensa - kuma kowa ya fahimta.",
+    "cta": "Shiga Ciki",
+    "poweredBy": "An yi shi da"
+  },
+  "dashboard": {
+    "hello": "Sannu,",
+    "welcome": "Barka da zuwa Babban Zauren Duniya",
+    "heroTitle": "Fassara",
+    "heroTitleHighlight": "ta atomatik.",
+    "heroTitle2": "Yi magana da",
+    "heroTitle2Highlight": "kowa.",
+    "communitiesTitle": "Al'ummomin Kai Tsaye",
+    "newRoom": "Sabon Zaure",
+    "roomSubtitle": "Shiga cikin tattaunawar duniya a wannan zauren.",
+    "engineActive": "Injin Duniya Yana Aiki",
+    "live": "Kai Tsaye"
+  },
+  "chat": {
+    "activePulsers": "Masu Amfani Da Suke Kai Tsaye",
+    "translationActive": "Fassara ta kai tsaye tana aiki",
+    "today": "Yau,",
+    "original": "Asali",
+    "translated": "An fassara",
+    "inputPlaceholder": "Rubuta a {{lang}} ko kowane harshe...",
+    "autoDetect": "Gane Harshe Da Kansa",
+    "poweredBy": "An yi shi ne da 🌍 Lingo Pulse Real-Time Translation Engine"
+  }
+}

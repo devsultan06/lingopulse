@@ -14,6 +14,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Home from "./screens/home/Home";
 import Footer from "./components/Footer";
 import Dashboard from "./components/dashboard/Dashboard";
+import ChatRoom from "./components/dashboard/ChatRoom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -68,6 +69,14 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/room/:roomId"
+          element={
+            <ProtectedRoute>
+              <ChatRoom />
             </ProtectedRoute>
           }
         />

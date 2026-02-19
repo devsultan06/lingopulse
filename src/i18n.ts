@@ -5,6 +5,7 @@ import en from "../locales/en.json";
 import fr from "../locales/fr.json";
 import es from "../locales/es.json";
 import ar from "../locales/ar.json";
+import ha from "../locales/ha.json";
 
 import LanguageDetector from "i18next-browser-languagedetector";
 
@@ -17,6 +18,7 @@ i18n
       fr: { translation: fr },
       es: { translation: es },
       ar: { translation: ar },
+      ha: { translation: ha },
     },
     fallbackLng: "en",
     detection: {

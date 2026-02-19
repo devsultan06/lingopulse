@@ -101,3 +101,24 @@ checksums:
     footer/contact: 9afa39bc47019ee6dec6c74b6273967c
     footer/copyright: 45dc50ec77766b6101213d3151cbf3a6
     footer/hackathon: 2cbe46180df671ca194e58123beef8e8
+    dashboard/hello: bff335b01588a8db802bd193c725ec11
+    dashboard/welcome: 8145e9caa8dc7567b18219292e3fe208
+    dashboard/heroTitle: 59f9803b27e2030ba7323ed239116cf7
+    dashboard/heroTitleHighlight: 685cb1c669f87b04ac704eac0aa6914d
+    dashboard/heroTitle2: 0952d7a22b5f0281ae8d88a8a8900ca6
+    dashboard/heroTitle2Highlight: 74ffb89da363821b9d5743d62166c474
+    dashboard/heroSubtitle: c4ba1eb5cd021f73384f307cb4fef2d0
+    dashboard/quickJoin: 4f549f58b1576e99022a422b246e2d9f
+    dashboard/communitiesTitle: 9dc3e2c4b3c6e215f982c4c379a2175a
+    dashboard/newRoom: b1cbc7213da0f7864c48753079e11ed2
+    dashboard/roomSubtitle: 8aee9ff99171e610443e0e53cb6a1941
+    dashboard/engineActive: 3ae1aa07f28873a10aca02545f41c05d
+    dashboard/live: 77a9c14fc9762e0e058e9b5ae04c8d15
+    chat/activePulsers: 63b8b2ae2fb5ed90d16d8f0803291b17
+    chat/translationActive: 7a909074c71537ec66d2836420fca585
+    chat/today: cc8f374226b7ebd4c2c1bc5cf81373ef
+    chat/original: 7e55782bdf7cb49f5616b326c003c278
+    chat/translated: 5b9d805410310b726f12bacb06da44e3
+    chat/inputPlaceholder: c2e48f3ab6b3899d11956fc8c529e356
+    chat/autoDetect: f3f27ebe1483d7cfc277934fcb6ac646
+    chat/poweredBy: f340a5c39e117851efb19fda0cab3215

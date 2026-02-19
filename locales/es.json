@@ -170,5 +170,30 @@
     "contact": "Contacto",
     "copyright": "© 2026 lingopulse. Construido con pasión para la gente del lenguaje.",
     "hackathon": "Construido para el Hackathon"
+  },
+  "dashboard": {
+    "hello": "Hola,",
+    "welcome": "Bienvenido al lobby global",
+    "heroTitle": "Traduce",
+    "heroTitleHighlight": "automáticamente.",
+    "heroTitle2": "Habla con",
+    "heroTitle2Highlight": "todos.",
+    "heroSubtitle": "Únete a una sala y habla tu idioma nativo. Nuestro motor traduce cada mensaje instantáneamente para todos los demás.",
+    "quickJoin": "Unirse rápido a sala 1",
+    "communitiesTitle": "Comunidades en vivo",
+    "newRoom": "Nueva sala",
+    "roomSubtitle": "Únete a la conversación global en esta sala.",
+    "engineActive": "Motor global activo",
+    "live": "En vivo"
+  },
+  "chat": {
+    "activePulsers": "Pulsers activos",
+    "translationActive": "Traducción en tiempo real activa",
+    "today": "Hoy,",
+    "original": "Original",
+    "translated": "Traducido",
+    "inputPlaceholder": "Escribe en {{lang}} o cualquier idioma...",
+    "autoDetect": "Detección automática",
+    "poweredBy": "Desarrollado por 🌍 motor de traducción en tiempo real Lingo Pulse"
   }
 }
