@@ -1,14 +1,28 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Globe, Zap, ChevronDown, MessageSquareMore } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-const onboardingSteps = [
-  {
-    title: "Choose Your Language",
-    text: "Select the language you prefer to read in. Lingo.dev’s AI engine automatically translates every message for you.",
-    color: "#dcf7e7", // Light green
-    icon: Globe,
-    visual: (
+interface StepItem {
+  title: string;
+  text: string;
+}
+
+const HowItWorks = () => {
+  const { t } = useTranslation();
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
+
+  const steps = t("howItWorks.steps", { returnObjects: true }) as StepItem[];
+  const stepColors = ["#dcf7e7", "#DAC3FF", "#FFA352"];
+
+  const stepVisuals = [
+    (
       <div className="relative w-full h-full flex items-center justify-center">
         <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_#000] w-[80%]">
           <div className="flex items-center justify-between border-b-2 border-black/5 pb-2 mb-2">
@@ -27,19 +41,12 @@ const onboardingSteps = [
             </div>
           </div>
         </div>
-        {/* Floating cursor element */}
         <div className="absolute top-[60%] right-[15%] w-6 h-6 bg-white border-2 border-black rounded shadow-[2px_2px_0px_0px_#000] flex items-center justify-center rotate-[15deg]">
           <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-black -rotate-45"></div>
         </div>
       </div>
     ),
-  },
-  {
-    title: "Post in Your Own Language",
-    text: "Write naturally in any language. Your message will be instantly translated for others.",
-    color: "#DAC3FF", // Soft purple
-    icon: MessageSquareMore,
-    visual: (
+    (
       <div className="relative w-full h-full flex items-center justify-center">
         <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_#000] w-[85%] rotate-[-2deg]">
           <div className="flex items-center gap-2 mb-3">
@@ -62,13 +69,7 @@ const onboardingSteps = [
         </div>
       </div>
     ),
-  },
-  {
-    title: "Connect in Real Time",
-    text: "Watch conversations update live as translations happen instantly across the community.",
-    color: "#FFA352", // Soft orange
-    icon: Zap,
-    visual: (
+    (
       <div className="relative w-full h-full flex items-center justify-center">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-24 h-24 bg-yellow-100 rounded-full border-2 border-black animate-ping opacity-20"></div>
@@ -79,22 +80,11 @@ const onboardingSteps = [
         <div className="absolute top-4 right-8 bg-green-400 border-2 border-black rounded-lg p-1 px-2 text-[10px] font-black text-white shadow-[2px_2px_0px_0px_#000] rotate-12">
           LIVE
         </div>
-        {/* Orbiting particles */}
         <div className="absolute w-2 h-2 bg-blue-400 border border-black rounded-full top-[20%] left-[20%] animate-bounce"></div>
         <div className="absolute w-2 h-2 bg-purple-400 border border-black rounded-full bottom-[20%] right-[30%] animate-bounce delay-100"></div>
       </div>
     ),
-  },
-];
-
-const HowItWorks = () => {
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
+  ];
 
   return (
     <section
@@ -114,11 +104,11 @@ const HowItWorks = () => {
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         <h2 className="text-4xl md:text-5xl font-black font-space-grotesk text-center mb-24 tracking-tighter">
-          How It Works
+          {t("howItWorks.title")}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 lg:gap-16">
-          {onboardingSteps.map((step, index) => (
+          {steps.map((step, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -130,9 +120,9 @@ const HowItWorks = () => {
               {/* Visual Container */}
               <div
                 className="w-full aspect-[4/3] rounded-[32px] border-4 border-black mb-10 shadow-[8px_8px_0px_0px_#000] p-6 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[4px_4px_0px_0px_#000]"
-                style={{ backgroundColor: step.color }}
+                style={{ backgroundColor: stepColors[index] }}
               >
-                {step.visual}
+                {stepVisuals[index]}
               </div>
 
               {/* Text Content */}

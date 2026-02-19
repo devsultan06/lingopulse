@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface NavbarProps {
   onJoinClick: () => void;
@@ -38,18 +39,26 @@ export const LingoPulseLogo = ({
 );
 
 const Navbar = ({ onJoinClick }: NavbarProps) => {
+  const { t, i18n } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("EN");
 
   const navLinks = [
-    { name: "How It Works", path: "#how-it-works" },
-    { name: "Features", path: "#features" },
-    { name: "Who's it for?", path: "#why-it-matters" },
-    { name: "FAQ", path: "#faq" },
+    { name: t("nav.howItWorks"), path: "#how-it-works" },
+    { name: t("nav.features"), path: "#features" },
+    { name: t("nav.whoIsItFor"), path: "#why-it-matters" },
+    { name: t("nav.faq"), path: "#faq" },
   ];
 
-  const languages = ["EN", "FR", "ES", "DE", "ZH"];
+  const languages = [
+    { code: "en", label: "EN" },
+    { code: "fr", label: "FR" },
+    { code: "es", label: "ES" },
+    { code: "ar", label: "AR" },
+  ];
+
+  const currentLangLabel =
+    languages.find((l) => l.code === i18n.language)?.label || "EN";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-2 py-8 md:px-6 font-satoshi">
@@ -85,7 +94,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                 className="flex items-center gap-2 font-bold text-dark-space hover:bg-black/5 px-3 py-2 rounded-xl transition-colors border-2 border-transparent active:border-black font-space-grotesk"
               >
                 <span className="text-xl">🌐</span>
-                <span className="text-[20px]">{currentLang}</span>
+                <span className="text-[20px]">{currentLangLabel}</span>
                 <svg
                   className={`w-4 h-4 transition-transform ${isLangOpen ? "rotate-180" : ""}`}
                   fill="none"
@@ -111,14 +120,14 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                   >
                     {languages.map((lang) => (
                       <button
-                        key={lang}
+                        key={lang.code}
                         onClick={() => {
-                          setCurrentLang(lang);
+                          i18n.changeLanguage(lang.code);
                           setIsLangOpen(false);
                         }}
                         className="w-full text-left px-4 py-2 font-bold hover:bg-blue-violet hover:text-white rounded-lg transition-colors"
                       >
-                        {lang}
+                        {lang.label}
                       </button>
                     ))}
                   </motion.div>
@@ -131,7 +140,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
               onClick={onJoinClick}
               className="btn-neubrutalism text-[20px] px-8 py-3 font-space-grotesk"
             >
-              Join Now <span className="ml-2">›</span>
+              {t("nav.joinNow")} <span className="ml-2">›</span>
             </button>
           </div>
 
@@ -184,7 +193,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                   <div className="flex items-center gap-3">
                     <LingoPulseLogo className="w-10 h-10" />
                     <span className="text-2xl font-bold font-space-grotesk tracking-tighter">
-                      Menu
+                      {t("nav.menu")}
                     </span>
                   </div>
                   <button
@@ -229,7 +238,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                     }}
                     className="text-2xl font-bold hover:text-blue-violet text-left"
                   >
-                    Login
+                    {t("nav.login")}
                   </button>
 
                   <button
@@ -242,7 +251,7 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                     <div className="absolute inset-0 bg-black rounded-full translate-x-1 translate-y-1"></div>
                     <div className="absolute inset-0 bg-blue-violet border-2 border-black rounded-full"></div>
                     <span className="relative text-white font-bold text-xl flex items-center gap-2">
-                      Join Now <span className="text-2xl">›</span>
+                      {t("nav.joinNow")} <span className="text-2xl">›</span>
                     </span>
                   </button>
                 </div>
@@ -252,10 +261,11 @@ const Navbar = ({ onJoinClick }: NavbarProps) => {
                   <div className="flex gap-3">
                     {languages.map((l) => (
                       <button
-                        key={l}
-                        className="font-bold text-sm bg-black/5 px-2 py-1 rounded-md"
+                        key={l.code}
+                        onClick={() => i18n.changeLanguage(l.code)}
+                        className={`font-bold text-sm px-2 py-1 rounded-md border-2 border-black transition-colors ${i18n.language === l.code ? "bg-blue-violet text-white" : "bg-black/5"}`}
                       >
-                        {l}
+                        {l.label}
                       </button>
                     ))}
                   </div>

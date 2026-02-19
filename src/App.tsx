@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "./components/Navbar";
 import JoinModal from "./components/home/JoinModal";
 import ScrollToTop from "./components/ScrollToTop";
@@ -9,6 +10,11 @@ import Footer from "./components/Footer";
 
 function App() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.dir = i18n.language === "ar" ? "rtl" : "ltr";
+  }, [i18n.language]);
 
   const handleJoinClick = () => setIsJoinModalOpen(true);
 

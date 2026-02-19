@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface HeroProps {
   onJoinClick: () => void;
 }
 
 const Hero = ({ onJoinClick }: HeroProps) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className="bg-daisy-white rounded-[48px] p-8 md:p-10 relative overflow-hidden"
@@ -24,13 +27,13 @@ const Hero = ({ onJoinClick }: HeroProps) => {
           className="flex flex-col items-center"
         >
           <h1 className="text-5xl md:text-7xl font-bold font-space-grotesk tracking-tighter leading-none mb-8">
-            Where The{" "}
+            {t("hero.title1")}{" "}
             <span className="inline-block bg-tangelo-orange text-white px-6 py-2 border-2 border-black rounded-full shadow-[4px_4px_0px_0px_#000] rotate-[-2deg] mx-2">
-              World
+              {t("hero.titleHighlight")}
             </span>{" "}
-            Speaks
+            {t("hero.title2")}
             <br />
-            Together{" "}
+            {t("hero.title3")}{" "}
             <span className="inline-flex relative items-center justify-center ml-4">
               {/* Creative Shape Cluster */}
               <div className="relative animate-bounce">
@@ -106,19 +109,18 @@ const Hero = ({ onJoinClick }: HeroProps) => {
           </motion.div>
 
           <p className="text-xl md:text-2xl font-medium text-dark-space/80 max-w-2xl mb-10 leading-relaxed">
-            A real-time multilingual community platform where everyone speaks
-            their own language — and everyone understands.
+            {t("hero.subtitle")}
           </p>
 
           <button
             onClick={onJoinClick}
             className="btn-neubrutalism text-xl px-12 py-5 mb-6 active:scale-95 transition-transform"
           >
-            Join The Pulse <span className="ml-2">›</span>
+            {t("hero.cta")} <span className="ml-2">›</span>
           </button>
 
           <p className="text-sm font-bold font-space-grotesk text-dark-space/40 tracking-tight">
-            Powered by{" "}
+            {t("hero.poweredBy")}{" "}
             <a
               href="https://lingo.dev/en"
               target="_blank"

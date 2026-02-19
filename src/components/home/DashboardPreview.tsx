@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const DashboardPreview = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       className="relative pt-32 pb-48 bg-[#DAC3FF] min-h-[750px]"
@@ -29,8 +32,10 @@ const DashboardPreview = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-6xl font-black font-space-grotesk mb-8 tracking-tighter text-black"
           >
-            The Internet, <br className="md:hidden" />
-            <span className="text-blue-violet">Without Language Barriers</span>
+            {t("dashboardPreview.title")} <br className="md:hidden" />
+            <span className="text-blue-violet">
+              {t("dashboardPreview.titleHighlight")}
+            </span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -39,9 +44,7 @@ const DashboardPreview = () => {
             transition={{ delay: 0.1 }}
             className="text-xl md:text-2xl font-medium text-[#1C303C]/80 max-w-3xl mx-auto leading-relaxed font-satoshi"
           >
-            Join a global space where every message is instantly translated into
-            your language. Speak freely. Understand everyone. Connect in real
-            time.
+            {t("dashboardPreview.subtitle")}
           </motion.p>
         </div>
 
@@ -71,15 +74,35 @@ const DashboardPreview = () => {
               <div className="flex-1 p-2 md:p-4 space-y-4 md:space-y-6">
                 <div className="space-y-2">
                   <span className="hidden md:block text-white/50 uppercase text-[10px] font-black tracking-widest pl-2">
-                    Channels
+                    {t("dashboardPreview.sidebar.channels")}
                   </span>
                   <div className="space-y-1">
                     {[
-                      { name: "Global Chat", icon: "🌍", active: false },
-                      { name: "French Room", icon: "🇫🇷", active: true },
-                      { name: "Hausa Room", icon: "🇳🇬", active: false },
-                      { name: "Spanish Room", icon: "🇪🇸", active: false },
-                      { name: "Trending", icon: "🔥", active: false },
+                      {
+                        name: t("dashboardPreview.sidebar.rooms.global"),
+                        icon: "🌍",
+                        active: false,
+                      },
+                      {
+                        name: t("dashboardPreview.sidebar.rooms.french"),
+                        icon: "🇫🇷",
+                        active: true,
+                      },
+                      {
+                        name: t("dashboardPreview.sidebar.rooms.hausa"),
+                        icon: "🇳🇬",
+                        active: false,
+                      },
+                      {
+                        name: t("dashboardPreview.sidebar.rooms.spanish"),
+                        icon: "🇪🇸",
+                        active: false,
+                      },
+                      {
+                        name: t("dashboardPreview.sidebar.rooms.trending"),
+                        icon: "🔥",
+                        active: false,
+                      },
                     ].map((item, i) => (
                       <button
                         key={i}
@@ -101,7 +124,7 @@ const DashboardPreview = () => {
               <div className="p-4 md:p-6 border-b-4 border-black flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl md:text-2xl font-black font-space-grotesk">
-                    # French Room
+                    # {t("dashboardPreview.sidebar.rooms.french")}
                   </span>
                 </div>
               </div>
@@ -111,14 +134,14 @@ const DashboardPreview = () => {
                 <div className="flex flex-col items-start max-w-[80%]">
                   <div className="bg-[#f0f0f0] border-2 border-black rounded-2xl rounded-tl-none p-4 shadow-[4px_4px_0px_0px_#000]">
                     <p className="text-sm md:text-base font-medium">
-                      Hello everyone
+                      {t("dashboardPreview.chat.messages.hello")}
                     </p>
                     <div className="mt-2 text-[10px] md:text-xs font-black uppercase text-black/40 flex items-center gap-2 border-t border-black/10 pt-2">
                       <span className="italic font-bold">
-                        Bonjour tout le monde
+                        {t("dashboardPreview.chat.messages.helloOriginal")}
                       </span>
                       <span className="bg-black/10 px-1.5 py-0.5 rounded uppercase leading-none">
-                        Translated from French
+                        {t("dashboardPreview.chat.messages.translatedFromFrench")}
                       </span>
                     </div>
                   </div>
@@ -128,14 +151,14 @@ const DashboardPreview = () => {
                 <div className="flex flex-col items-start max-w-[80%]">
                   <div className="bg-[#E2F7ED] border-2 border-black rounded-2xl rounded-tl-none p-4 shadow-[4px_4px_0px_0px_#000]">
                     <p className="text-sm md:text-base font-medium">
-                      Hi! How is the hackathon going?
+                      {t("dashboardPreview.chat.messages.hi")}
                     </p>
                     <div className="mt-2 text-[10px] md:text-xs font-black uppercase text-black/40 flex items-center gap-2 border-t border-black/10 pt-2">
                       <span className="italic font-bold">
-                        Sannu! Ya nassin taron hackathon din yake?
+                        {t("dashboardPreview.chat.messages.hiOriginal")}
                       </span>
                       <span className="bg-black/10 px-1.5 py-0.5 rounded uppercase leading-none">
-                        Translated from Hausa
+                        {t("dashboardPreview.chat.messages.translatedFromHausa")}
                       </span>
                     </div>
                   </div>
@@ -145,7 +168,7 @@ const DashboardPreview = () => {
                 <div className="flex flex-col items-end w-full">
                   <div className="bg-tangelo-orange border-2 border-black rounded-2xl rounded-tr-none p-4 shadow-[4px_4px_0px_0px_#000] max-w-[80%]">
                     <p className="text-sm md:text-base font-medium text-white">
-                      It's going great! Everyone understands me perfectly.
+                      {t("dashboardPreview.chat.messages.great")}
                     </p>
                   </div>
                 </div>
@@ -156,7 +179,7 @@ const DashboardPreview = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Type your message in any language..."
+                    placeholder={t("dashboardPreview.chat.inputPlaceholder")}
                     className="w-full bg-[#f0f0f0] border-2 border-black rounded-xl p-4 md:p-5 pr-12 font-medium focus:outline-none focus:ring-0 shadow-[2px_2px_0px_0px_#000]"
                   />
                   <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#6E48FF] border-2 border-black rounded-lg flex items-center justify-center text-white shadow-[2px_2px_0px_0px_#000]">

@@ -1,0 +1,174 @@
+{
+  "nav": {
+    "howItWorks": "How It Works",
+    "features": "Features",
+    "whoIsItFor": "Who's it for?",
+    "faq": "FAQ",
+    "joinNow": "Join Now",
+    "login": "Login",
+    "menu": "Menu"
+  },
+  "hero": {
+    "title1": "Where The",
+    "titleHighlight": "World",
+    "title2": "Speaks",
+    "title3": "Together",
+    "subtitle": "A real-time multilingual community platform where everyone speaks their own language — and everyone understands.",
+    "cta": "Join The Pulse",
+    "poweredBy": "Powered by"
+  },
+  "whoIsThisFor": {
+    "badge": "Anyone in LingoPulse!",
+    "title": "Who Is This For?",
+    "description": "This platform is built for global communities, students, creators, remote teams, and anyone who wants to connect beyond language limits.",
+    "footer": "Whether you speak English, French, Hausa, Arabic, Spanish — you belong here."
+  },
+  "features": {
+    "title": "What Makes It Powerful?",
+    "badge": {
+      "text": "Built for ",
+      "highlight": "Connection"
+    },
+    "items": [
+      {
+        "title": "Speak Freely",
+        "description": "Post messages in your native language without worrying about barriers."
+      },
+      {
+        "title": "Instant Translation",
+        "description": "Messages are automatically translated by Lingo.dev for every user in real-time."
+      },
+      {
+        "title": "Real-Time Interaction",
+        "description": "Conversations update live as they happen. No refreshing needed."
+      },
+      {
+        "title": "Translated Replies",
+        "description": "Every reply comes back in your language automatically."
+      },
+      {
+        "title": "Inclusive Community",
+        "description": "Everyone participates equally, no matter where they are from."
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "steps": [
+      {
+        "title": "Choose Your Language",
+        "text": "Select the language you prefer to read in. Lingo.dev’s AI engine automatically translates every message for you."
+      },
+      {
+        "title": "Post in Your Own Language",
+        "text": "Write naturally in any language. Your message will be instantly translated for others."
+      },
+      {
+        "title": "Connect in Real Time",
+        "text": "Watch conversations update live as translations happen instantly across the community."
+      }
+    ]
+  },
+  "communityRules": {
+    "title": "The rules are simple!",
+    "subtitle": "To help maintain a safe and welcoming environment, we ask that all community members adhere to a few guidelines that are listed below.",
+    "note": "Note:",
+    "noteText": "Info shared by members cannot be considered as legal advice. Members are not responsible for the same.",
+    "rules": [
+      {
+        "title": "Bring only good vibes!",
+        "text": "The pulse of our community depends on your genuine intent to collaborate and help, so bring in that dose of positivity, please!"
+      },
+      {
+        "title": "Please refrain from Spamming or selling!",
+        "text": "Let's keep our community focused, clean and free from promotions! Nobody wants that!"
+      },
+      {
+        "title": "Speak your mind!",
+        "text": "This is a safe space that's free of bias, conflict and criticism."
+      }
+    ]
+  },
+  "dashboardPreview": {
+    "title": "The Internet, ",
+    "titleHighlight": "Without Language Barriers",
+    "subtitle": "Join a global space where every message is instantly translated into your language. Speak freely. Understand everyone. Connect in real time.",
+    "sidebar": {
+      "channels": "Channels",
+      "rooms": {
+        "global": "Global Chat",
+        "french": "French Room",
+        "hausa": "Hausa Room",
+        "spanish": "Spanish Room",
+        "trending": "Trending"
+      }
+    },
+    "chat": {
+      "inputPlaceholder": "Type your message in any language...",
+      "translatedFrom": "Translated from",
+      "messages": {
+        "hello": "Hello everyone",
+        "helloOriginal": "Bonjour tout le monde",
+        "translatedFromFrench": "Translated from French",
+        "hi": "Hi! How is the hackathon going?",
+        "hiOriginal": "Sannu! Ya nassin taron hackathon din yake?",
+        "translatedFromHausa": "Translated from Hausa",
+        "great": "It's going great! Everyone understands me perfectly."
+      }
+    }
+  },
+  "faq": {
+    "title": "FAQ's",
+    "items": [
+      {
+        "question": "What are we building?",
+        "answer": "Lingopulse is a community-driven platform powered by Lingo.dev's AI localization engine. We leverage Lingo.dev to automate and perfect real-time, context-aware translations, allowing global communities to connect seamlessly without language barriers."
+      },
+      {
+        "question": "Who is it meant for?",
+        "answer": "It's for anyone passionate about languages—from beginners taking their first steps to polyglots looking to maintain their fluency in a social environment."
+      },
+      {
+        "question": "Is this community moderated? If yes, why?",
+        "answer": "Yes, we prioritize a safe and welcoming environment. Our moderators ensure that conversations remain respectful and follow our community guidelines."
+      },
+      {
+        "question": "I have already applied. How long before I hear back?",
+        "answer": "We review applications daily! You should typically hear back from us within 24-48 hours via the email you provided."
+      },
+      {
+        "question": "Can I promote my services or products in any of the channels here?",
+        "answer": "To maintain a focused and clean experience, we generally discourage self-promotion. However, we have specific channels for sharing useful resources!"
+      },
+      {
+        "question": "If I want to add my friends or colleagues to this community, how do I do it?",
+        "answer": "Once you're a member, you can find an invite link in your dashboard to share with your network. We'd love to have them!"
+      }
+    ]
+  },
+  "cta": {
+    "title1": "Ready to stay ahead of ",
+    "title2": "the ",
+    "titleHighlight": "language",
+    "title3": " game?",
+    "subtitle": "Join our growing community today!",
+    "button": "Join Now"
+  },
+  "joinModal": {
+    "title1": "Join the ",
+    "titleHighlight": "Pulse",
+    "subtitle": "Start connecting with curious minds across the globe. No language barriers, just pure connection.",
+    "googleButton": "Login with Google",
+    "terms": "By joining, you agree to our",
+    "termsLink": "Terms",
+    "privacyLink": "Privacy Policy"
+  },
+  "footer": {
+    "headline": "What we're building",
+    "description": "A real-time community home powered by Lingo.dev’s AI localization engine. Built for the hackathon to demonstrate how Lingo.dev automates global connection by breaking every language barrier with context-aware translations.",
+    "twitter": "Twitter/X",
+    "contact": "Contact",
+    "copyright": "© 2026 lingopulse. Built with passion for language folks.",
+    "hackathon": "Built for the Hackathon"
+  }
+}
