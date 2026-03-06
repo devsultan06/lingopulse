@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LingoPulseLogo } from "../Navbar";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import {
   ArrowLeft,
   Send,
   Globe,
-  Languages,
   Smile,
   MoreVertical,
   Hash,
@@ -18,17 +18,20 @@ import {
   X,
   Menu,
 } from "lucide-react";
-
-interface Message {
-  id: number;
-  user: string;
-  avatar: string;
-  originalText: string;
-  translatedText: string;
-  originalLang: string;
-  isMe: boolean;
-  timestamp: string;
-}
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  query,
+  orderBy,
+  serverTimestamp,
+  doc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { translateText } from "../../lib/translation";
 
 const ChatRoom = () => {
   const { roomId } = useParams();
@@ -38,46 +41,146 @@ const ChatRoom = () => {
   const [inputText, setInputText] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      user: "Marie",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marie",
-      originalText: "Bonjour tout le monde! Comment ça va aujourd'hui?",
-      translatedText: "Hello everyone! How is it going today?",
-      originalLang: "French",
-      isMe: false,
-      timestamp: "10:30 AM",
-    },
-    {
-      id: 2,
-      user: "Sultan",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sultan",
-      originalText: "I'm doing great, Marie! Excited to test this platform.",
-      translatedText:
-        "Je vais très bien, Marie ! Ravi de tester cette plateforme.",
-      originalLang: "English",
-      isMe: true,
-      timestamp: "10:32 AM",
-    },
-    {
-      id: 3,
-      user: "Yuki",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Yuki",
-      originalText: "こんにちは！この翻訳はすごいですね。",
-      translatedText: "Hello! This translation is amazing.",
-      originalLang: "Japanese",
-      isMe: false,
-      timestamp: "10:35 AM",
-    },
-  ]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [currentRoom, setCurrentRoom] = useState<any>(null);
+  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+  const [typingUsers, setTypingUsers] = useState<any[]>([]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const typingTimeoutRef = useRef<any>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-  const rooms = [
-    { id: "global-1", name: "Global Pulse" },
-    { id: "tech-talks", name: "Tech Discussion" },
-    { id: "community-hub", name: "Community Hub" },
-    { id: "hausa-circle", name: "Hausa Circle" },
-  ];
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target as Node)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const onEmojiClick = (emojiData: { emoji: string }) => {
+    setInputText((prev) => prev + emojiData.emoji);
+    // Trigger typing update when emoji is added
+    if (user && roomId) {
+      setDoc(doc(db, "rooms", roomId, "typing", user.uid), {
+        userName: user.displayName || "User",
+        userAvatar:
+          user.photoURL ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
+        timestamp: serverTimestamp(),
+      });
+    }
+  };
+
+  useEffect(() => {
+    // Fetch all rooms for sidebar
+    const unsubscribeRooms = onSnapshot(collection(db, "rooms"), (snapshot) => {
+      const roomsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRooms(roomsData);
+    });
+
+    // Fetch online users
+    const unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+      const usersData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setOnlineUsers(usersData);
+    });
+
+    return () => {
+      unsubscribeRooms();
+      unsubscribeUsers();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    // Fetch current room details
+    const unsubscribeRoom = onSnapshot(doc(db, "rooms", roomId), (docSnap) => {
+      if (docSnap.exists()) {
+        setCurrentRoom({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        setCurrentRoom(null);
+      }
+    });
+
+    // Fetch messages for current room
+    const q = query(
+      collection(db, "rooms", roomId, "messages"),
+      orderBy("createdAt", "asc"),
+    );
+
+    const unsubscribeMessages = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(msgs);
+    });
+
+    // Fetch typing users
+    const unsubscribeTyping = onSnapshot(
+      collection(db, "rooms", roomId, "typing"),
+      (snapshot) => {
+        const typingData = snapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((u) => u.id !== user?.uid); // Don't show myself
+        setTypingUsers(typingData);
+      },
+    );
+
+    return () => {
+      unsubscribeRoom();
+      unsubscribeMessages();
+      unsubscribeTyping();
+    };
+  }, [roomId, user?.uid]);
+
+  // Translation Effect
+  useEffect(() => {
+    const handleTranslations = async () => {
+      if (!roomId || !user) return;
+      const targetLang = i18n.language;
+
+      for (const msg of messages) {
+        // If not sent by me and not in my language
+        if (msg.senderId !== user.uid && msg.language !== targetLang) {
+          // If translation doesn't exist for this language
+          if (!msg.translations || !msg.translations[targetLang]) {
+            try {
+              const translated = await translateText(
+                msg.text,
+                targetLang,
+                msg.language,
+              );
+
+              // Only update if we actually got a translation
+              if (translated && translated !== msg.text) {
+                await updateDoc(doc(db, "rooms", roomId, "messages", msg.id), {
+                  [`translations.${targetLang}`]: translated,
+                });
+              }
+            } catch (err) {
+              console.error("Translation error for message:", msg.id, err);
+            }
+          }
+        }
+      }
+    };
+
+    handleTranslations();
+  }, [messages, i18n.language, roomId, user]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -89,35 +192,64 @@ const ChatRoom = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !roomId || !user) return;
 
-    const newMessage: Message = {
-      id: messages.length + 1,
-      user: user?.user_metadata?.full_name || "Me",
-      avatar:
-        user?.user_metadata?.avatar_url ||
-        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`,
-      originalText: inputText,
-      translatedText: `[Auto-Translated]: ${inputText}`,
-      originalLang:
-        i18n.language === "en"
-          ? "English"
-          : i18n.language === "fr"
-            ? "French"
-            : i18n.language === "ha"
-              ? "Hausa"
-              : "Other",
-      isMe: true,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    setMessages([...messages, newMessage]);
+    const messageText = inputText;
     setInputText("");
+
+    try {
+      // Clear typing status when message is sent
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      await deleteDoc(doc(db, "rooms", roomId, "typing", user.uid));
+
+      await addDoc(collection(db, "rooms", roomId, "messages"), {
+        text: messageText,
+        senderId: user.uid,
+        senderName: user.displayName || "User",
+        senderAvatar:
+          user.photoURL ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
+        createdAt: serverTimestamp(),
+        language: i18n.language,
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputText(value);
+
+    if (!user || !roomId) return;
+
+    // Set typing status in Firestore
+    try {
+      if (value.trim().length > 0) {
+        await setDoc(doc(db, "rooms", roomId, "typing", user.uid), {
+          userName: user.displayName || "User",
+          userAvatar:
+            user.photoURL ||
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
+          timestamp: serverTimestamp(),
+        });
+
+        // Clear previous timeout
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+        // Set new timeout to clear typing status after 3 seconds of inactivity
+        typingTimeoutRef.current = setTimeout(async () => {
+          await deleteDoc(doc(db, "rooms", roomId, "typing", user.uid));
+        }, 3000);
+      } else {
+        // If text is cleared, remove typing status immediately
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        await deleteDoc(doc(db, "rooms", roomId, "typing", user.uid));
+      }
+    } catch (error) {
+      console.error("Error updating typing status:", error);
+    }
   };
 
   const SidebarContent = () => (
@@ -172,21 +304,39 @@ const ChatRoom = () => {
             Live Pulsers
           </h3>
           <div className="space-y-4 px-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="relative">
-                  <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`}
-                    className="w-8 h-8 rounded-xl border-2 border-black bg-white"
-                    alt="user"
-                  />
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-azure-green border-2 border-black rounded-full" />
+            {onlineUsers
+              .filter((u) => u.uid !== user?.uid) // Only show other users
+              .reduce((acc: any[], current: any) => {
+                // Remove duplicates if same user is in DB twice
+                const x = acc.find((item) => item.uid === current.uid);
+                if (!x) return acc.concat([current]);
+                else return acc;
+              }, [])
+              .map((u) => (
+                <div key={u.id} className="flex items-center gap-3">
+                  <div className="relative">
+                    <img
+                      src={
+                        u.photoURL ||
+                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.email}`
+                      }
+                      className="w-8 h-8 rounded-xl border-2 border-black bg-white"
+                      alt={u.displayName}
+                    />
+                    <div
+                      className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${u.isOnline ? "bg-azure-green" : "bg-gray-400"} border-2 border-black rounded-full`}
+                    />
+                  </div>
+                  <span className="font-bold text-xs text-dark-space/80">
+                    {u.displayName || "Anonymous"}
+                  </span>
                 </div>
-                <span className="font-bold text-xs text-dark-space/80">
-                  User_{i}
-                </span>
-              </div>
-            ))}
+              ))}
+            {onlineUsers.filter((u) => u.uid !== user?.uid).length === 0 && (
+              <p className="text-[10px] font-bold opacity-30 uppercase px-2">
+                No one else active
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -195,7 +345,7 @@ const ChatRoom = () => {
         <div className="flex items-center gap-3 mb-4">
           <img
             src={
-              user?.user_metadata?.avatar_url ||
+              user?.photoURL ||
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`
             }
             className="w-10 h-10 rounded-xl border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000]"
@@ -203,7 +353,7 @@ const ChatRoom = () => {
           />
           <div className="min-w-0">
             <p className="font-black text-xs truncate uppercase tracking-tighter">
-              {user?.user_metadata?.full_name || "Friend"}
+              {user?.displayName || "Friend"}
             </p>
             <p className="text-[9px] font-bold opacity-40 truncate uppercase tracking-widest">
               Active Pulse
@@ -270,13 +420,14 @@ const ChatRoom = () => {
                   strokeWidth={4}
                 />
                 <h2 className="text-xl md:text-2xl font-black tracking-tighter leading-none uppercase truncate max-w-[120px] sm:max-w-none">
-                  {roomId?.replace("-", " ")}
+                  {currentRoom?.name || roomId?.replace("-", " ")}
                 </h2>
               </div>
               <div className="flex items-center gap-2 mt-1 px-0.5">
                 <Users size={10} className="opacity-30" />
                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-30">
-                  24 {t("chat.activePulsers")}
+                  {onlineUsers.filter((u) => u.isOnline).length}{" "}
+                  {t("chat.activePulsers")}
                 </span>
               </div>
             </div>
@@ -316,64 +467,54 @@ const ChatRoom = () => {
               </span>
             </div>
 
-            {messages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`flex gap-3 md:gap-4 ${msg.isMe ? "flex-row-reverse" : "flex-row"}`}
-              >
-                {/* Avatar */}
-                <div className="flex-none self-start mt-1">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl border-2 border-black overflow-hidden bg-white shadow-[2px_2px_0px_0px_#000]">
-                    <img
-                      src={msg.avatar}
-                      alt={msg.user}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
+            {messages.map((msg) => {
+              const isMe = msg.senderId === user?.uid;
+              const timestamp =
+                msg.createdAt?.toDate()?.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }) || "";
 
-                {/* Content Box */}
-                <div
-                  className={`max-w-[85%] md:max-w-[70%] space-y-1.5 ${msg.isMe ? "items-end text-right" : "items-start text-left"}`}
+              return (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex gap-3 md:gap-4 ${isMe ? "flex-row-reverse" : "flex-row"}`}
                 >
-                  <div className="flex items-center gap-2 px-2">
-                    <span className="font-black text-[10px] md:text-[11px] uppercase tracking-tight">
-                      {msg.user}
-                    </span>
-                    <span className="text-[8px] md:text-[9px] font-bold opacity-30">
-                      {msg.timestamp}
-                    </span>
+                  {/* Avatar */}
+                  <div className="flex-none self-start mt-1">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl border-2 border-black overflow-hidden bg-white shadow-[2px_2px_0px_0px_#000]">
+                      <img
+                        src={msg.senderAvatar}
+                        alt={msg.senderName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
 
+                  {/* Content Box */}
                   <div
-                    className={`relative p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 border-black shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] ${msg.isMe ? "bg-blue-violet text-white" : "bg-white text-black"}`}
+                    className={`max-w-[85%] md:max-w-[70%] space-y-1.5 ${isMe ? "items-end text-right" : "items-start text-left"}`}
                   >
-                    {msg.isMe ? (
+                    <div className="flex items-center gap-2 px-2">
+                      <span className="font-black text-[10px] md:text-[11px] uppercase tracking-tight">
+                        {msg.senderName}
+                      </span>
+                      <span className="text-[8px] md:text-[9px] font-bold opacity-30">
+                        {timestamp}
+                      </span>
+                    </div>
+
+                    <div
+                      className={`relative p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 border-black shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] ${isMe ? "bg-blue-violet text-white" : "bg-white text-black"}`}
+                    >
                       <p className="text-base md:text-lg font-bold leading-tight tracking-tight">
-                        {msg.originalText}
+                        {msg.text}
                       </p>
-                    ) : (
-                      <div className="space-y-3 md:space-y-4">
-                        <div>
-                          <div className="flex items-center gap-1.5 mb-2 opacity-30">
-                            <Languages
-                              className="w-2.5 h-2.5 md:w-3 md:h-3"
-                              strokeWidth={3}
-                            />
-                            <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest">
-                              {msg.originalLang} ({t("chat.original")})
-                            </span>
-                          </div>
-                          <p className="text-sm md:text-lg font-bold leading-snug tracking-tight">
-                            {msg.originalText}
-                          </p>
-                        </div>
 
-                        <div className="h-[2px] w-full bg-black/5" />
-
-                        <div>
+                      {!isMe && msg.translations?.[i18n.language] && (
+                        <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t-2 border-black/5">
                           <div className="flex items-center gap-1.5 mb-2 text-blue-violet">
                             <Globe
                               className="w-2.5 h-2.5 md:w-3 md:h-3"
@@ -384,16 +525,16 @@ const ChatRoom = () => {
                               {t("chat.translated")})
                             </span>
                           </div>
-                          <p className="text-lg md:text-xl font-black tracking-tight leading-tight">
-                            {msg.translatedText}
+                          <p className="text-lg md:text-xl font-black tracking-tight leading-tight text-blue-violet">
+                            {msg.translations[i18n.language]}
                           </p>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -401,6 +542,41 @@ const ChatRoom = () => {
         {/* Input Area */}
         <footer className="h-[160px] bg-white border-t-4 border-black p-4 md:p-8 z-20 flex items-center shrink-0">
           <div className="max-w-4xl mx-auto w-full">
+            {/* Typing Indicator */}
+            <div className="h-6 mb-1">
+              <AnimatePresence>
+                {typingUsers.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    className="flex items-center gap-2"
+                  >
+                    <div className="flex -space-x-2 mr-1">
+                      {typingUsers.slice(0, 3).map((u) => (
+                        <img
+                          key={u.id}
+                          src={u.userAvatar}
+                          className="w-5 h-5 rounded-full border border-white bg-white shadow-sm"
+                          alt={u.userName}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex gap-1 mr-1">
+                      <span className="w-1 h-1 bg-azure-green rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <span className="w-1 h-1 bg-azure-green rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <span className="w-1 h-1 bg-azure-green rounded-full animate-bounce" />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-azure-green/60 italic">
+                      {typingUsers.length === 1
+                        ? `${typingUsers[0].userName} is typing...`
+                        : `${typingUsers.length} people are typing...`}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <form
               onSubmit={handleSendMessage}
               className="relative group flex items-center gap-3 md:gap-4"
@@ -408,19 +584,41 @@ const ChatRoom = () => {
               <div className="flex-1 relative">
                 <div className="absolute inset-0 bg-black rounded-xl md:rounded-2xl translate-x-1.5 translate-y-1.5 md:translate-x-2 md:translate-y-2 group-focus-within:translate-x-1 group-focus-within:translate-y-1 transition-transform" />
                 <div className="relative flex items-center bg-white border-2 border-black p-1.5 md:p-2 rounded-xl md:rounded-2xl gap-2">
-                  <button
-                    type="button"
-                    className="p-2 md:p-3 text-black/20 hover:text-blue-violet transition-colors"
-                  >
-                    <Smile
-                      className="w-5 h-5 md:w-6 md:h-6"
-                      strokeWidth={2.5}
-                    />
-                  </button>
+                  <div ref={emojiPickerRef} className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      className={`p-2 md:p-3 transition-colors ${showEmojiPicker ? "text-blue-violet" : "text-black/20 hover:text-blue-violet"}`}
+                    >
+                      <Smile
+                        className="w-5 h-5 md:w-6 md:h-6"
+                        strokeWidth={2.5}
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {showEmojiPicker && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                          className="absolute bottom-full left-0 mb-4 z-50 shadow-[8px_8px_0px_0px_#000] border-4 border-black rounded-2xl overflow-hidden"
+                        >
+                          <EmojiPicker
+                            onEmojiClick={onEmojiClick}
+                            theme={Theme.LIGHT}
+                            width={320}
+                            height={400}
+                            skinTonesDisabled
+                            searchDisabled
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                   <input
                     type="text"
                     value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
+                    onChange={handleInputChange}
                     placeholder={t("chat.inputPlaceholder", {
                       lang: i18n.language.toUpperCase(),
                     })}

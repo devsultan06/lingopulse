@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { LingoPulseLogo } from "../Navbar";
 import { useTranslation } from "react-i18next";
-import { supabase } from "../../lib/supabase";
+import { auth } from "../../lib/firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 interface JoinModalProps {
   isOpen: boolean;
@@ -13,13 +14,9 @@ const JoinModal = ({ isOpen, onClose }: JoinModalProps) => {
 
   const handleGoogleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      if (error) throw error;
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      onClose();
     } catch (error) {
       console.error("Error logging in with Google:", error);
     }

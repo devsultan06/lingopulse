@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import CreateRoomModal from "./CreateRoomModal";
 import {
   LogOut,
   Globe,
@@ -13,7 +16,7 @@ import {
 } from "lucide-react";
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateLanguage } = useAuth();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -29,27 +32,20 @@ const Dashboard = () => {
   const currentLangLabel =
     languages.find((l) => l.code === i18n.language)?.label || "EN";
 
-  const availableRooms = [
-    { id: "global-1", name: "Global Pulse", activeUsers: 128, type: "General" },
-    {
-      id: "tech-talks",
-      name: "Tech Discussion",
-      activeUsers: 45,
-      type: "Topic",
-    },
-    {
-      id: "community-hub",
-      name: "Community Hub",
-      activeUsers: 89,
-      type: "Social",
-    },
-    {
-      id: "hausa-circle",
-      name: "Hausa Circle",
-      activeUsers: 34,
-      type: "Cultural",
-    },
-  ];
+  const [availableRooms, setAvailableRooms] = useState<any[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "rooms"), (snapshot) => {
+      const roomsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAvailableRooms(roomsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleRoomClick = (roomId: string) => {
     navigate(`/dashboard/room/${roomId}`);
@@ -64,7 +60,7 @@ const Dashboard = () => {
             <div className="w-16 h-16 rounded-2xl border-2 border-black overflow-hidden bg-white shadow-[2px_2px_0px_0px_#000]">
               <img
                 src={
-                  user?.user_metadata?.avatar_url ||
+                  user?.photoURL ||
                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`
                 }
                 alt="Profile"
@@ -75,7 +71,7 @@ const Dashboard = () => {
               <h1 className="text-3xl font-black tracking-tighter leading-none">
                 {t("dashboard.hello")}{" "}
                 <span className="text-blue-violet subrayado">
-                  {user?.user_metadata?.full_name?.split(" ")[0] || "Friend"}
+                  {user?.displayName?.split(" ")[0] || "Friend"}
                 </span>
               </h1>
               <p className="font-bold opacity-40 text-sm">
@@ -111,7 +107,7 @@ const Dashboard = () => {
                       <button
                         key={lang.code}
                         onClick={() => {
-                          i18n.changeLanguage(lang.code);
+                          updateLanguage(lang.code);
                           setIsLangOpen(false);
                         }}
                         className={`w-full text-left px-4 py-3 font-black rounded-xl transition-colors ${i18n.language === lang.code ? "bg-blue-violet text-white" : "hover:bg-blue-violet/10"}`}
@@ -150,11 +146,16 @@ const Dashboard = () => {
             {t("dashboard.heroSubtitle")}
           </p>
           <button
-            onClick={() => handleRoomClick("global-1")}
-            className="bg-azure-green border-2 border-black px-8 md:px-12 py-4 md:py-6 rounded-2xl md:rounded-3xl font-black text-xl md:text-2xl text-white shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center gap-3 mx-auto"
+            onClick={() =>
+              availableRooms.length > 0 && handleRoomClick(availableRooms[0].id)
+            }
+            className="bg-azure-green border-2 border-black px-8 md:px-12 py-4 md:py-6 rounded-2xl md:rounded-3xl font-black text-xl md:text-2xl text-white shadow-[4px_4px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center gap-3 mx-auto disabled:opacity-50 disabled:grayscale"
+            disabled={availableRooms.length === 0}
           >
             <Sparkles fill="white" className="w-5 h-5 md:w-6 md:h-6" />
-            {t("dashboard.quickJoin")}
+            {availableRooms.length > 0
+              ? `${t("dashboard.quickJoin")} ${availableRooms[0].name}`
+              : t("dashboard.quickJoin")}
             <ArrowRight strokeWidth={3} className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </section>
@@ -165,7 +166,10 @@ const Dashboard = () => {
             <h3 className="text-2xl md:text-3xl font-black tracking-tight underline appearance-none decoration-2 decoration-tangelo-orange underline-offset-8 uppercase">
               {t("dashboard.communitiesTitle")}
             </h3>
-            <button className="flex items-center gap-2 font-black text-blue-violet hover:underline text-sm md:text-base">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 font-black text-blue-violet hover:underline text-sm md:text-base"
+            >
               <Plus strokeWidth={3} size={20} />
               {t("dashboard.newRoom")}
             </button>
@@ -195,7 +199,7 @@ const Dashboard = () => {
                     {room.name}
                   </h4>
                   <p className="font-bold opacity-40 text-xs md:text-sm">
-                    {t("dashboard.roomSubtitle")}
+                    {room.description || t("dashboard.roomSubtitle")}
                   </p>
                 </div>
                 <div className="flex justify-end mt-4">
@@ -220,6 +224,10 @@ const Dashboard = () => {
           </div>
         </footer>
       </div>
+      <CreateRoomModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 };
