@@ -17,6 +17,13 @@ import {
   Bell,
   X,
   Menu,
+  Mic,
+  Square,
+  Trash2,
+  Check,
+  CheckCheck,
+  Crown,
+  Settings,
 } from "lucide-react";
 import {
   collection,
@@ -47,8 +54,13 @@ const ChatRoom = () => {
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [typingUsers, setTypingUsers] = useState<any[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+
   const typingTimeoutRef = useRef<any>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const recordingTimerRef = useRef<any>(null);
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -194,6 +206,9 @@ const ChatRoom = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isRecording) {
+      stopRecording();
+    }
     if (!inputText.trim() || !roomId || !user) return;
 
     const messageText = inputText;
@@ -213,6 +228,7 @@ const ChatRoom = () => {
           `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
         createdAt: serverTimestamp(),
         language: i18n.language,
+        status: "sent",
       });
     } catch (error) {
       console.error("Error sending message:", error);
@@ -249,6 +265,144 @@ const ChatRoom = () => {
       }
     } catch (error) {
       console.error("Error updating typing status:", error);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const startRecording = async () => {
+    try {
+      // Set up Speech Recognition for transcription
+      const SpeechRecognition =
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang =
+          i18n.language === "ar"
+            ? "ar-SA"
+            : i18n.language === "fr"
+              ? "fr-FR"
+              : "en-US";
+
+        recognition.onresult = (event: any) => {
+          let interimTranscript = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              setInputText((prev) => prev + event.results[i][0].transcript);
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+        };
+
+        recognition.start();
+        recognitionRef.current = recognition;
+        setIsRecording(true);
+        setRecordingTime(0);
+        recordingTimerRef.current = setInterval(() => {
+          setRecordingTime((prev) => prev + 1);
+        }, 1000);
+      } else {
+        alert("Speech recognition not supported in this browser.");
+      }
+    } catch (err) {
+      console.error("Error starting speech recognition:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (isRecording) {
+      setIsRecording(false);
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Mark messages as read when they appear
+    if (!roomId || !user || !messages.length) return;
+
+    const markAsRead = async () => {
+      const unreadMessages = messages.filter(
+        (msg) =>
+          msg.senderId !== user.uid &&
+          (!msg.readBy || !msg.readBy.includes(user.uid)),
+      );
+
+      for (const msg of unreadMessages) {
+        try {
+          const currentReadBy = msg.readBy || [];
+          await updateDoc(doc(db, "rooms", roomId, "messages", msg.id), {
+            readBy: [...currentReadBy, user.uid],
+            status: "read", // Simple flag for UI
+          });
+        } catch (err) {
+          console.error("Error marking message as read:", err);
+        }
+      }
+    };
+
+    markAsRead();
+  }, [messages, roomId, user]);
+
+  const isAdmin = currentRoom?.createdBy === user?.uid;
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!isAdmin || !roomId) return;
+    if (window.confirm("Delete this message?")) {
+      try {
+        await deleteDoc(doc(db, "rooms", roomId, "messages", messageId));
+      } catch (err) {
+        console.error("Error deleting message:", err);
+      }
+    }
+  };
+
+  const handleRenameRoom = async () => {
+    if (!isAdmin || !roomId) return;
+    const newName = window.prompt("Enter new room name:", currentRoom.name);
+    if (newName && newName !== currentRoom.name) {
+      try {
+        await updateDoc(doc(db, "rooms", roomId), { name: newName });
+      } catch (err) {
+        console.error("Error renaming room:", err);
+      }
+    }
+  };
+
+  const handleReaction = async (messageId: string, emoji: string) => {
+    if (!roomId || !user) return;
+    const messageRef = doc(db, "rooms", roomId, "messages", messageId);
+    const msg = messages.find((m) => m.id === messageId);
+    if (!msg) return;
+
+    const currentReactions = msg.reactions || {};
+    const userReactions = currentReactions[emoji] || [];
+
+    let newUserReactions;
+    if (userReactions.includes(user.uid)) {
+      newUserReactions = userReactions.filter(
+        (uid: string) => uid !== user.uid,
+      );
+    } else {
+      newUserReactions = [...userReactions, user.uid];
+    }
+
+    try {
+      await updateDoc(messageRef, {
+        [`reactions.${emoji}`]: newUserReactions,
+      });
+    } catch (err) {
+      console.error("Error adding reaction:", err);
     }
   };
 
@@ -307,7 +461,6 @@ const ChatRoom = () => {
             {onlineUsers
               .filter((u) => u.uid !== user?.uid) // Only show other users
               .reduce((acc: any[], current: any) => {
-                // Remove duplicates if same user is in DB twice
                 const x = acc.find((item) => item.uid === current.uid);
                 if (!x) return acc.concat([current]);
                 else return acc;
@@ -454,6 +607,18 @@ const ChatRoom = () => {
                   strokeWidth={2.5}
                 />
               </button>
+              {isAdmin && (
+                <button
+                  onClick={handleRenameRoom}
+                  className="p-2 md:p-2.5 hover:bg-black/5 rounded-xl transition-colors text-blue-violet"
+                >
+                  <Settings
+                    size={18}
+                    className="md:w-5 md:h-5"
+                    strokeWidth={2.5}
+                  />
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -498,20 +663,96 @@ const ChatRoom = () => {
                     className={`max-w-[85%] md:max-w-[70%] space-y-1.5 ${isMe ? "items-end text-right" : "items-start text-left"}`}
                   >
                     <div className="flex items-center gap-2 px-2">
-                      <span className="font-black text-[10px] md:text-[11px] uppercase tracking-tight">
+                      <span className="font-black text-[10px] md:text-[11px] uppercase tracking-tight flex items-center gap-1">
                         {msg.senderName}
+                        {msg.senderId === currentRoom?.createdBy && (
+                          <Crown
+                            size={10}
+                            className="text-yellow-500 fill-yellow-500"
+                          />
+                        )}
                       </span>
                       <span className="text-[8px] md:text-[9px] font-bold opacity-30">
                         {timestamp}
                       </span>
                     </div>
 
-                    <div
-                      className={`relative p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 border-black shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] ${isMe ? "bg-blue-violet text-white" : "bg-white text-black"}`}
-                    >
-                      <p className="text-base md:text-lg font-bold leading-tight tracking-tight">
-                        {msg.text}
-                      </p>
+                    <div className="relative group/msg">
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteMessage(msg.id)}
+                          className={`absolute top-0 ${isMe ? "-left-8" : "-right-8"} p-1.5 opacity-0 group-hover/msg:opacity-100 transition-opacity text-black/20 hover:text-red-500`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+
+                      <div
+                        className={`relative p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 border-black shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] ${isMe ? "bg-blue-violet text-white" : "bg-white text-black"}`}
+                      >
+                        <p className="text-base md:text-lg font-bold leading-tight tracking-tight">
+                          {msg.text}
+                        </p>
+
+                        {isMe && (
+                          <div className="absolute bottom-2 right-3 md:bottom-3 md:right-4 flex items-center">
+                            {msg.status === "read" ? (
+                              <CheckCheck
+                                size={14}
+                                className="text-azure-green"
+                                strokeWidth={3}
+                              />
+                            ) : (
+                              <Check
+                                size={14}
+                                className="text-white/40"
+                                strokeWidth={3}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Reactions Display */}
+                      {msg.reactions &&
+                        Object.keys(msg.reactions).some(
+                          (emoji) => msg.reactions[emoji].length > 0,
+                        ) && (
+                          <div
+                            className={`flex flex-wrap gap-1.5 mt-2 ${isMe ? "justify-end" : "justify-start"}`}
+                          >
+                            {Object.entries(msg.reactions).map(
+                              ([emoji, uids]: [string, any]) =>
+                                uids.length > 0 && (
+                                  <button
+                                    key={emoji}
+                                    onClick={() =>
+                                      handleReaction(msg.id, emoji)
+                                    }
+                                    className={`flex items-center gap-1 px-2 py-1 rounded-full border-2 border-black text-xs font-black shadow-[2px_2px_0px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#000] ${uids.includes(user?.uid) ? "bg-blue-violet text-white" : "bg-white text-black"}`}
+                                  >
+                                    <span>{emoji}</span>
+                                    <span>{uids.length}</span>
+                                  </button>
+                                ),
+                            )}
+                          </div>
+                        )}
+
+                      {/* Reaction Picker on Hover */}
+                      <div
+                        className={`absolute -top-10 ${isMe ? "right-0" : "left-0"} opacity-0 group-hover/msg:opacity-100 transition-opacity flex items-center gap-1 bg-white border-2 border-black p-1.5 rounded-full shadow-[3px_3px_0px_0px_#000] z-50`}
+                      >
+                        {["👍", "❤️", "😂", "😮", "😢", "🔥"].map((emoji) => (
+                          <button
+                            key={emoji}
+                            onClick={() => handleReaction(msg.id, emoji)}
+                            className="p-1 hover:scale-125 transition-transform"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
 
                       {!isMe && msg.translations?.[i18n.language] && (
                         <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t-2 border-black/5">
@@ -583,64 +824,116 @@ const ChatRoom = () => {
             >
               <div className="flex-1 relative">
                 <div className="absolute inset-0 bg-black rounded-xl md:rounded-2xl translate-x-1.5 translate-y-1.5 md:translate-x-2 md:translate-y-2 group-focus-within:translate-x-1 group-focus-within:translate-y-1 transition-transform" />
-                <div className="relative flex items-center bg-white border-2 border-black p-1.5 md:p-2 rounded-xl md:rounded-2xl gap-2">
-                  <div ref={emojiPickerRef} className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className={`p-2 md:p-3 transition-colors ${showEmojiPicker ? "text-blue-violet" : "text-black/20 hover:text-blue-violet"}`}
-                    >
-                      <Smile
-                        className="w-5 h-5 md:w-6 md:h-6"
-                        strokeWidth={2.5}
+                <div className="relative flex items-center bg-white border-2 border-black p-1.5 md:p-2 rounded-xl md:rounded-2xl gap-2 flex-1">
+                  {isRecording ? (
+                    <div className="flex-1 flex items-center px-4 gap-4 bg-red-50/50 rounded-lg py-2">
+                      <motion.div
+                        animate={{ opacity: [1, 0.5, 1] }}
+                        transition={{ repeat: Infinity, duration: 1 }}
+                        className="w-3 h-3 bg-red-500 rounded-full"
                       />
-                    </button>
-                    <AnimatePresence>
-                      {showEmojiPicker && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                          className="absolute bottom-full left-0 mb-4 z-50 shadow-[8px_8px_0px_0px_#000] border-4 border-black rounded-2xl overflow-hidden"
+                      <span className="font-black text-red-500 tabular-nums">
+                        {formatTime(recordingTime)}
+                      </span>
+                      <div className="flex-1 text-red-500/50 font-bold truncate">
+                        {inputText || "Listening..."}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsRecording(false);
+                          if (recordingTimerRef.current)
+                            clearInterval(recordingTimerRef.current);
+                          if (recognitionRef.current)
+                            recognitionRef.current.stop();
+                          setInputText("");
+                        }}
+                        className="p-2 hover:bg-black/5 rounded-full text-black/40"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div ref={emojiPickerRef} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          className={`p-2 md:p-3 transition-colors ${showEmojiPicker ? "text-blue-violet" : "text-black/20 hover:text-blue-violet"}`}
                         >
-                          <EmojiPicker
-                            onEmojiClick={onEmojiClick}
-                            theme={Theme.LIGHT}
-                            width={320}
-                            height={400}
-                            skinTonesDisabled
-                            searchDisabled
+                          <Smile
+                            className="w-5 h-5 md:w-6 md:h-6"
+                            strokeWidth={2.5}
                           />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <input
-                    type="text"
-                    value={inputText}
-                    onChange={handleInputChange}
-                    placeholder={t("chat.inputPlaceholder", {
-                      lang: i18n.language.toUpperCase(),
-                    })}
-                    className="flex-1 py-2 md:py-3 text-base md:text-lg font-bold outline-none placeholder:text-black/10 tracking-tight"
-                  />
-                  <div className="hidden lg:flex items-center gap-2 font-black text-[9px] opacity-40 uppercase border-r-2 border-black/10 pr-4 mr-2 tracking-widest">
-                    <Globe size={14} strokeWidth={2.5} />
-                    <span>{t("chat.autoDetect")}</span>
-                  </div>
+                        </button>
+                        <AnimatePresence>
+                          {showEmojiPicker && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                              className="absolute bottom-full left-0 mb-4 z-50 shadow-[8px_8px_0px_0px_#000] border-4 border-black rounded-2xl overflow-hidden"
+                            >
+                              <EmojiPicker
+                                onEmojiClick={onEmojiClick}
+                                theme={Theme.LIGHT}
+                                width={320}
+                                height={400}
+                                skinTonesDisabled
+                                searchDisabled
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                      <input
+                        type="text"
+                        value={inputText}
+                        onChange={handleInputChange}
+                        placeholder={t("chat.inputPlaceholder", {
+                          lang: i18n.language.toUpperCase(),
+                        })}
+                        className="flex-1 py-2 md:py-3 text-base md:text-lg font-bold outline-none placeholder:text-black/10 tracking-tight"
+                      />
+                      <button
+                        type="button"
+                        onClick={startRecording}
+                        className="p-2 md:p-3 text-black/20 hover:text-blue-violet transition-colors mr-2"
+                      >
+                        <Mic
+                          className="w-5 h-5 md:w-6 md:h-6"
+                          strokeWidth={2.5}
+                        />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
               <button
                 type="submit"
-                disabled={!inputText.trim()}
-                className="bg-azure-green border-2 border-black p-4 md:p-5 rounded-xl md:rounded-2xl shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center text-white disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                onClick={(e) => {
+                  if (isRecording) {
+                    e.preventDefault();
+                    stopRecording();
+                  }
+                }}
+                disabled={!inputText.trim() && !isRecording}
+                className={`${isRecording ? "bg-red-500" : "bg-azure-green"} border-2 border-black p-4 md:p-5 rounded-xl md:rounded-2xl shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center text-white disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
               >
-                <Send
-                  className="w-5 h-5 md:w-6 md:h-6"
-                  fill="currentColor"
-                  strokeWidth={3}
-                />
+                {isRecording ? (
+                  <Square
+                    className="w-5 h-5 md:w-6 md:h-6"
+                    fill="currentColor"
+                    strokeWidth={3}
+                  />
+                ) : (
+                  <Send
+                    className="w-5 h-5 md:w-6 md:h-6"
+                    fill="currentColor"
+                    strokeWidth={3}
+                  />
+                )}
               </button>
             </form>
             <div className="hidden sm:flex justify-center mt-6 gap-8">

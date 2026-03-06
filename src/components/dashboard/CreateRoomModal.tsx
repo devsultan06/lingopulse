@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { X, Hash, MessageSquare } from "lucide-react";
 import { db } from "../../lib/firebase";
@@ -12,6 +13,7 @@ interface CreateRoomModalProps {
 
 const CreateRoomModal = ({ isOpen, onClose }: CreateRoomModalProps) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,6 +28,7 @@ const CreateRoomModal = ({ isOpen, onClose }: CreateRoomModalProps) => {
         name: name.trim(),
         description: description.trim(),
         createdAt: serverTimestamp(),
+        createdBy: user?.uid,
       });
       setName("");
       setDescription("");
