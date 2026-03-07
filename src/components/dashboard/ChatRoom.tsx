@@ -690,9 +690,32 @@ const ChatRoom = () => {
                       <div
                         className={`relative p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 border-black shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] ${isMe ? "bg-blue-violet text-white" : "bg-white text-black"}`}
                       >
-                        <p className="text-base md:text-lg font-bold leading-tight tracking-tight">
-                          {msg.text}
-                        </p>
+                        {/* Show translated text prominently for incoming messages */}
+                        {!isMe && msg.translations?.[i18n.language] ? (
+                          <>
+                            <p className="text-base md:text-lg font-bold leading-tight tracking-tight">
+                              {msg.translations[i18n.language]}
+                            </p>
+                            <div className="mt-2 pt-2 border-t border-black/10">
+                              <div className="flex items-center gap-1.5 mb-1">
+                                <Globe
+                                  className="w-2.5 h-2.5"
+                                  strokeWidth={3}
+                                />
+                                <span className="text-[8px] font-black uppercase tracking-widest opacity-30">
+                                  ORIGINAL
+                                </span>
+                              </div>
+                              <p className="text-xs font-bold opacity-40 leading-tight italic">
+                                {msg.text}
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-base md:text-lg font-bold leading-tight tracking-tight">
+                            {msg.text}
+                          </p>
+                        )}
 
                         {isMe && (
                           <div className="absolute bottom-2 right-3 md:bottom-3 md:right-4 flex items-center">
@@ -753,24 +776,6 @@ const ChatRoom = () => {
                           </button>
                         ))}
                       </div>
-
-                      {!isMe && msg.translations?.[i18n.language] && (
-                        <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t-2 border-black/5">
-                          <div className="flex items-center gap-1.5 mb-2 text-blue-violet">
-                            <Globe
-                              className="w-2.5 h-2.5 md:w-3 md:h-3"
-                              strokeWidth={3}
-                            />
-                            <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest leading-none">
-                              {i18n.language.toUpperCase()} (
-                              {t("chat.translated")})
-                            </span>
-                          </div>
-                          <p className="text-lg md:text-xl font-black tracking-tight leading-tight text-blue-violet">
-                            {msg.translations[i18n.language]}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </motion.div>
